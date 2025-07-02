@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from flasgger.utils import swag_from
 from ..models import db, Book
 from ..cache import get_cached_books, set_cached_books
+from datetime import datetime
 
 books_bp = Blueprint("books", __name__)
 
@@ -57,18 +58,39 @@ def get_books():
 })
 def create_book():
     data = request.get_json()
-    if not data.get("title") or not data.get("author"):
-        return jsonify({"error": "Missing title or author"}), 400
 
+    
+    title = data.get("title")
+    author = data.get("author")
+    published_str = data.get("published_date")
+
+    if not title or not author or not published_str:
+        return jsonify({
+            "error": "Missing required field(s). 'title', 'author', and 'published_date' are all required."
+        }), 400
+
+    
+    try:
+        published_date = datetime.strptime(published_str, '%Y-%m-%d').date()
+    except ValueError:
+        return jsonify({
+            "error": "Invalid 'published_date'. Expected format: YYYY-MM-DD."
+        }), 400
+
+    
     book = Book(
-        title=data["title"],
-        author=data["author"],
-        published_date=data.get("published_date")
+        title=title,
+        author=author,
+        published_date=published_date
     )
+
     db.session.add(book)
     db.session.commit()
 
-    # Optional: clear cache to reflect new book
+    
     set_cached_books(None)
 
-    return jsonify({"message": "Book created", "id": book.id}), 201
+    return jsonify({
+        "message": "Book created successfully.",
+        "id": book.id
+    }), 201

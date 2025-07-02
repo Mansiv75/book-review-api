@@ -8,7 +8,7 @@ fake = Faker()
 def seed_data():
     app = create_app()
     with app.app_context():
-        # Clean existing data
+        
         Review.query.delete()
         Book.query.delete()
         db.session.commit()
@@ -38,7 +38,7 @@ def seed_data():
                 review_count += 1
 
         db.session.commit()
-        print(f"✅ Seeded: {len(books)} books, {review_count} reviews")
+        print(f"Seeded: {len(books)} books, {review_count} reviews")
 
 if __name__ == "__main__":
     seed_data()

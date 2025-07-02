@@ -9,7 +9,6 @@ def test_create_book(client):
     assert "id" in data
 
 def test_get_books(client):
-    # Add one
     client.post("/books/", json={"title": "T", "author": "A"})
     res = client.get("/books/")
     assert res.status_code == 200
@@ -18,11 +17,9 @@ def test_get_books(client):
     assert len(data) > 0
 
 def test_add_review_to_book(client):
-    # First, create a book
     res = client.post("/books/", json={"title": "Test", "author": "Author"})
     book_id = res.get_json()["id"]
 
-    # Now, add a review
     review_res = client.post(f"/books/{book_id}/reviews", json={
         "rating": 5,
         "comment": "Loved it!"
@@ -34,17 +31,14 @@ def test_add_review_to_book(client):
     assert "id" in review_data
 
 def test_get_reviews_for_book(client):
-    # Create a book
     res = client.post("/books/", json={"title": "B", "author": "A"})
     book_id = res.get_json()["id"]
 
-    # Add a review
     client.post(f"/books/{book_id}/reviews", json={
         "rating": 4,
         "comment": "Nice one"
     })
 
-    # Fetch reviews
     res = client.get(f"/books/{book_id}/reviews")
     assert res.status_code == 200
     data = res.get_json()

@@ -23,7 +23,6 @@ def create_app():
     redis_client.init_app(app)  
     register_error_handlers(app)
 
-    # Register blueprints
     from .routes.books import books_bp
     from .routes.reviews import reviews_bp
     app.register_blueprint(books_bp, url_prefix="/books")

@@ -9,9 +9,9 @@ class RedisClient:
         try:
             self.redis = Redis(host="localhost", port=6379, decode_responses=True)
             self.redis.ping()
-            print("✅ Connected to Redis")
+            print("Connected to Redis")
         except RedisError as e:
-            print(f"⚠️ Redis unavailable: {e}")
+            print(f"Redis unavailable: {e}")
             self.redis = None
 
     def get(self, key):
@@ -40,6 +40,6 @@ def get_cached_books():
 
 def set_cached_books(data):
     if data is None:
-        redis_client.set("books", json.dumps([]), ex=0)  # expire now
+        redis_client.set("books", json.dumps([]), ex=0)  
     else:
         redis_client.set("books", json.dumps(data), ex=60)
