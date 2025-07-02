@@ -15,10 +15,12 @@ def create_app():
     app.config.from_object("config.Config")
 
     db.init_app(app)
+    from . import models 
+
     migrate.init_app(app, db)
     swagger.init_app(app)
 
-    redis_client.init_app(app)  # Redis wrapper you'll create in `cache.py`
+    redis_client.init_app(app)  
     register_error_handlers(app)
 
     # Register blueprints
