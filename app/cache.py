@@ -1,11 +1,45 @@
-# app/cache.py
+import json
+from redis import Redis, RedisError
 
 class RedisClient:
+    def __init__(self):
+        self.redis = None
+
     def init_app(self, app):
-        pass  # No actual Redis connection yet
+        try:
+            self.redis = Redis(host="localhost", port=6379, decode_responses=True)
+            self.redis.ping()
+            print("✅ Connected to Redis")
+        except RedisError as e:
+            print(f"⚠️ Redis unavailable: {e}")
+            self.redis = None
+
+    def get(self, key):
+        if not self.redis:
+            return None
+        try:
+            return self.redis.get(key)
+        except RedisError:
+            return None
+
+    def set(self, key, value, ex=60):
+        if not self.redis:
+            return
+        try:
+            self.redis.set(key, value, ex=ex)
+        except RedisError:
+            pass
 
 redis_client = RedisClient()
-# This is a placeholder for the Redis client.
-# In a real application, you would use a library like `redis-py` to connect to a Redis server.
-# The `init_app` method would typically be used to configure the Redis client with the Flask app's settings.
-# For example, you might set the Redis URL from the app's configuration.        
+
+def get_cached_books():
+    data = redis_client.get("books")
+    if data:
+        return json.loads(data)
+    return None
+
+def set_cached_books(data):
+    if data is None:
+        redis_client.set("books", json.dumps([]), ex=0)  # expire now
+    else:
+        redis_client.set("books", json.dumps(data), ex=60)

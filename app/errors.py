@@ -1,10 +1,14 @@
-# app/errors.py
+from flask import jsonify
 
 def register_error_handlers(app):
     @app.errorhandler(404)
     def not_found(error):
-        return {"error": "Not Found"}, 404
+        return jsonify({"error": "Not found"}), 404
+
+    @app.errorhandler(400)
+    def bad_request(error):
+        return jsonify({"error": "Bad request"}), 400
 
     @app.errorhandler(500)
     def internal_error(error):
-        return {"error": "Internal Server Error"}, 500
+        return jsonify({"error": "Internal server error"}), 500
