@@ -15,7 +15,12 @@ class Book(db.Model):
 
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    book_id = db.Column(db.Integer, db.ForeignKey("book.id"), nullable=False)
+    book_id = db.Column(
+        db.Integer, 
+        db.ForeignKey("book.id"), 
+        nullable=False,
+        index=True  
+    )
     rating = db.Column(db.Integer, nullable=False)
     comment = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
