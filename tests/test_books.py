@@ -16,3 +16,38 @@ def test_get_books(client):
     data = res.get_json()
     assert isinstance(data, list)
     assert len(data) > 0
+
+def test_add_review_to_book(client):
+    # First, create a book
+    res = client.post("/books/", json={"title": "Test", "author": "Author"})
+    book_id = res.get_json()["id"]
+
+    # Now, add a review
+    review_res = client.post(f"/books/{book_id}/reviews", json={
+        "rating": 5,
+        "comment": "Loved it!"
+    })
+
+    assert review_res.status_code == 201
+    review_data = review_res.get_json()
+    assert review_data["message"] == "Review added"
+    assert "id" in review_data
+
+def test_get_reviews_for_book(client):
+    # Create a book
+    res = client.post("/books/", json={"title": "B", "author": "A"})
+    book_id = res.get_json()["id"]
+
+    # Add a review
+    client.post(f"/books/{book_id}/reviews", json={
+        "rating": 4,
+        "comment": "Nice one"
+    })
+
+    # Fetch reviews
+    res = client.get(f"/books/{book_id}/reviews")
+    assert res.status_code == 200
+    data = res.get_json()
+    assert isinstance(data, list)
+    assert len(data) == 1
+    assert data[0]["rating"] == 4
